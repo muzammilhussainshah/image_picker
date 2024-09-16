@@ -12,6 +12,7 @@ import Animated, {
 
 const { width } = Dimensions.get('window');
 const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 
 export function RenderItem({ item }) {
@@ -31,11 +32,12 @@ export function RenderItem({ item }) {
 
     //     fetchDominantColor();
     // }, [item.uri]);
-    console.log(item, 'item')
+    console.log(item.uri, 'item')
     useEffect(() => {
         // Extract dominant color from the image and set it as background
         const fetchDominantColor = async () => {
-            const result = await ImageColors.getColors(item.uri, {
+            const fileData = await CameraRoll.iosGetImageDataById(item.uri);
+            const result = await ImageColors.getColors(fileData.node.image.filepath, {
                 fallback: '#ffffff', // Fallback color in case extraction fails
                 cache: true,
             });
@@ -44,7 +46,6 @@ export function RenderItem({ item }) {
                 setBackgroundColor(result.detail); // Use average or dominant color
             }
         };
-
         fetchDominantColor();
     }, [item.uri]);
 
@@ -101,8 +102,8 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     imageWrapper: {
-        width: '90%', // Adjust this based on how much padding you want between the image and the container
-        height: '90%', // Adjust this to create spacing between image and background
+        width: '100%', // Adjust this based on how much padding you want between the image and the container
+        height: '100%', // Adjust this to create spacing between image and background
     },
     image: {
         width: '100%',

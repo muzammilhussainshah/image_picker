@@ -1,3 +1,5 @@
+import { RenderItem } from '@/components/RenderImage';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -8,80 +10,33 @@ import {
   StyleSheet,
   Dimensions,
   Button,
-  Platform,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as DominantColor from 'react-native-dominant-color'; // Install this library for dominant color extraction
-import FastImage from 'react-native-fast-image'; // For optimized image rendering
-import { RenderItem } from '@/components/RenderImage';
+// import ImageColors from 'react-native-image-colors'; // Dominant color extraction library
+// import * as ImagePicker from 'react-native-image-picker'; // Image Picker library
+// import CameraRoll, { iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 
 const { width } = Dimensions.get('window');
 const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
+// import { requestGalleryPermission } from './permissions'; // Import permission function
 
 export default function HomeScreen() {
+
   const [images, setImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
 
-  const openImagePicker = async () => {
-    // Ask for permissions
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need media library permissions to make this work!');
-      return;
-    }
-
-    // Open image picker
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-    });
-
-    if (!result.cancelled) {
-      setImages(result.assets);
-    }
-  };
-
-  // const renderItem = ({ item }) => {
-  //   const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
-
-  //   useEffect(() => {
-  //     // Extract dominant color from the image and set it as background
-  //     const fetchDominantColor = async () => {
-  //       try {
-  //         const color = await DominantColor.getDominantColor(item.uri);
-  //         setBackgroundColor(color);
-  //       } catch (error) {
-  //         console.error('Error fetching dominant color:', error);
-  //       }
-  //     };
-
-  //     fetchDominantColor();
-  //   }, [item.uri]);
-
-  //   return (
-  //     <TouchableOpacity
-  //       style={[
-  //         styles.imageContainer,
-  //         { backgroundColor }, // Set the extracted background color
-  //         selectedImages.includes(item.uri) && styles.selectedImageContainer,
-  //       ]}
-  //       onPress={() => toggleSelectImage(item.uri)}
-  //     >
-  //       <View style={styles.imageWrapper}>
-  //         <FastImage
-  //           source={{ uri: item.uri }}
-  //           style={styles.image}
-  //           resizeMode={FastImage.resizeMode.contain} // Maintain the aspect ratio of the image
-  //         />
-  //       </View>
-  //       {selectedImages.includes(item.uri) && (
-  //         <View style={styles.overlay}>
-  //           <Text style={styles.checkmark}>✓</Text>
-  //         </View>
-  //       )}
-  //     </TouchableOpacity>
-  //   );
-  // };
+  useEffect(() => {
+    const getGalleryImages = async () => {
+      // const granted = await requestGalleryPermission();
+      // if (granted) {
+      const fetchedImages: any = await CameraRoll.getPhotos({
+        first: 10,
+        assetType: 'Photos',
+      });
+      console.log(fetchedImages, 'fetchedImages')
+      setImages(fetchedImages.edges.map(edge => edge.node.image));
+    };
+    getGalleryImages();
+  }, [])
   return (
     <View style={styles.container}>
       {/* <Button title="Open Image Picker" onPress={openImagePicker} /> */}
@@ -93,17 +48,17 @@ export default function HomeScreen() {
             <RenderItem item={item} />
           )
         }}
-        keyExtractor={(item) => item.uri}
+        keyExtractor={(item, index) => index.toString()}
         numColumns={3}
       />
 
     </View>
   );
-}
+};
+
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 100,
     flex: 1,
     padding: 10,
     backgroundColor: '#f5f5f5',
