@@ -55,7 +55,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <Button title="Open Image Picker" onPress={() => { }} />
       <FlatList
-        data={images}
+        data={['custom',...images]}
         renderItem={({ item }) => <RenderItem item={item} />}
         keyExtractor={(item, index) => index.toString()}
         numColumns={3}

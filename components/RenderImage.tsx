@@ -13,62 +13,75 @@ import Animated, {
 const { width } = Dimensions.get('window');
 const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 export function RenderItem({ item }: any) {
-    const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
+    const [backgroundColorPrimary, setBackgroundColorPrimary] = useState('#ffffff'); // Default background color
+    const [backgroundColorSecondary, setBackgroundColorSecondary] = useState('#ffffff'); // Default background color
     const [selectedImages, setSelectedImages] = useState([]);
     useEffect(() => {
-        // Extract dominant color from the image and set it as background
-        const fetchDominantColor = async () => {
-            const fileData: any = await CameraRoll.iosGetImageDataById(item.uri);
-            const result: any = await ImageColors.getColors(fileData.node.image.filepath, {
-                fallback: '#ffffff', // Fallback color in case extraction fails
-                cache: true,
-            });
-            console.log(result, 'result')
-            if (result.platform === 'android' || result.platform === 'ios') {
-                setBackgroundColor(result.detail); // Use average or dominant color
-            }
-        };
-        fetchDominantColor();
-    }, [item.uri]);
+        if (item == 'custom') {
 
-    // const toggleSelectImage = (uri) => {
-    //     if (selectedImages.includes(uri)) {
-    //         setSelectedImages(selectedImages.filter((imageUri) => imageUri !== uri));
-    //     } else {
-    //         setSelectedImages([...selectedImages, uri]);
-    //     }
-    // };
+        } else {
+            const fetchDominantColor = async () => {
+                const fileData: any = await CameraRoll.iosGetImageDataById(item.uri);
+                const result: any = await ImageColors.getColors(fileData.node.image.filepath, {
+                    fallback: '#ffffff', // Fallback color in case extraction fails
+                    cache: true,
+                });
+                console.log(result, 'result')
+                if (result.platform === 'android' || result.platform === 'ios') {
+                    setBackgroundColorPrimary(result.background); // Use average or dominant color
+                    setBackgroundColorSecondary(result.primary); // Use average or dominant color
+                }
+            };
+            fetchDominantColor();
+        }
+    }, [item?.uri]);
 
     return (
-        <TouchableOpacity
-            style={[
-                styles.imageContainer,
-                { backgroundColor }, // Set the extracted background color
-                selectedImages.includes(item.uri) && styles.selectedImageContainer,
-            ]}
-            // onPress={() => toggleSelectImage(item.uri)}
-        >
-            <View style={styles.imageWrapper}>
-                {/* <FastImage
-                    source={{ uri: item.uri }}
-                    style={styles.image}
-                    resizeMode={FastImage.resizeMode.contain} // Maintain the aspect ratio of the image
-                /> */}
-                <Image
-                    style={styles.image}
-                    resizeMode='contain'
-                    source={{ uri: item.uri }}
-                />
-            </View>
-            {/* {selectedImages.includes(item.uri) && (
-                <View style={styles.overlay}>
-                    <Text style={styles.checkmark}>✓</Text>
-                </View>
-            )} */}
-        </TouchableOpacity>
+        <>
+            {item == 'custom' ?
+                <TouchableOpacity
+                    style={[
+                        styles.imageContainer,
+                        selectedImages.includes(item.uri) && styles.selectedImageContainer,
+                    ]}
+                >
+                    <LinearGradient
+                        colors={[backgroundColorPrimary, backgroundColorSecondary,]}
+                        style={styles.background}
+                    >
+                        <View style={[styles.imageWrapper, { justifyContent: "center", alignItems: "center" }]}>
+                            <Text >camera</Text>
+
+                        </View>
+                    </LinearGradient>
+                </TouchableOpacity >
+                :
+                <TouchableOpacity
+                    style={[
+                        styles.imageContainer,
+                        selectedImages.includes(item.uri) && styles.selectedImageContainer,
+                    ]}
+                >
+                    <LinearGradient
+                        colors={[backgroundColorPrimary, backgroundColorSecondary,]}
+                        style={styles.background}
+                    >
+                        <View style={styles.imageWrapper}>
+
+                            <Image
+                                style={styles.image}
+                                resizeMode='contain'
+                                source={{ uri: item.uri }}
+                            />
+                        </View>
+                    </LinearGradient>
+                </TouchableOpacity>
+            }
+        </>
     );
 }
 
@@ -79,7 +92,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     imageContainer: {
-        width: width / 3, // 3 images per row
+        width: width / 3 - 6, // 3 images per row
         height: portraitHeight, // Fixed height to create the portrait effect
         justifyContent: 'center', // Center the image vertically
         alignItems: 'center', // Center the image horizontally
@@ -107,5 +120,12 @@ const styles = StyleSheet.create({
     checkmark: {
         color: 'white',
         fontSize: 30,
+    },
+    background: {
+        flex: 1,
+        height: '100%', width: '100%',
+        borderRadius: 10, overflow: "hidden",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
