@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import ImageColors from 'react-native-image-colors';
 import Animated, {
@@ -9,6 +9,7 @@ import Animated, {
     withRepeat,
     withSequence,
 } from 'react-native-reanimated';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width } = Dimensions.get('window');
 const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
@@ -16,7 +17,7 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
-export function RenderItem({ item }: any) {
+export function RenderItem({ item, callBack }: any) {
     const [backgroundColorPrimary, setBackgroundColorPrimary] = useState('#ffffff'); // Default background color
     const [backgroundColorSecondary, setBackgroundColorSecondary] = useState('#ffffff'); // Default background color
     const [selectedImages, setSelectedImages] = useState([]);
@@ -30,7 +31,6 @@ export function RenderItem({ item }: any) {
                     fallback: '#ffffff', // Fallback color in case extraction fails
                     cache: true,
                 });
-                console.log(result, 'result')
                 if (result.platform === 'android' || result.platform === 'ios') {
                     setBackgroundColorPrimary(result.background); // Use average or dominant color
                     setBackgroundColorSecondary(result.primary); // Use average or dominant color
@@ -39,11 +39,44 @@ export function RenderItem({ item }: any) {
             fetchDominantColor();
         }
     }, [item?.uri]);
+    // const requestCameraPermission = async () => {
+    //     if (Platform.OS !== 'web') {
+    //         const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             alert('Sorry, we need camera permissions to make this work!');
+    //         }
+    //     }
+    // };
+    // Camera open karne ke liye function
+    const openCamera = async () => {
+        console.log(ImagePicker, 'ImagePicker')
+        let result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            // setImage(result.assets[0].uri);
+            // const result: any = await ImageColors.getColors(result.assets[0].uri, {
+            //     fallback: '#ffffff', // Fallback color in case extraction fails
+            //     cache: true,
+            // });
+            // if (result.platform === 'android' || result.platform === 'ios') {
+            //     setBackgroundColorPrimary(result.background); // Use average or dominant color
+            //     setBackgroundColorSecondary(result.primary); // Use average or dominant color
+            //     callBack({ image: result.assets[0].uri, backgroundColorPrimary: result.background, backgroundColorSecondary: result.primary })
+            // }
+
+        }
+    };
 
     return (
         <>
             {item == 'custom' ?
                 <TouchableOpacity
+                    onPress={openCamera}
                     style={[
                         styles.imageContainer,
                         selectedImages.includes(item.uri) && styles.selectedImageContainer,
@@ -67,6 +100,10 @@ export function RenderItem({ item }: any) {
                 </TouchableOpacity >
                 :
                 <TouchableOpacity
+                    onPress={async () => {
+                        const fileData: any = await CameraRoll.iosGetImageDataById(item.uri);
+                        callBack({ image: fileData?.node?.image?.filepath, backgroundColorPrimary, backgroundColorSecondary })
+                    }}
                     style={[
                         styles.imageContainer,
                         selectedImages.includes(item.uri) && styles.selectedImageContainer,

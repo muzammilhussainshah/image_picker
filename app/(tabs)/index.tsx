@@ -1,5 +1,6 @@
 import { RenderItem } from '@/components/RenderImage';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -12,6 +13,7 @@ import {
   Modal, // Import Modal
   TouchableOpacity,
   Text,
+  Image,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -24,6 +26,7 @@ export default function HomeScreen() {
   const [endCursor, setEndCursor] = useState<string | null>(null); // For pagination
   const [hasNextPage, setHasNextPage] = useState(true); // Flag for more images
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
+  const [selectedImageDetail, setSelectedImageDetail] = useState<any>(); // State to control modal visibility
 
   const getGalleryImages = async (afterCursor: string | null = null) => {
     if (loading || !hasNextPage) return;
@@ -55,6 +58,7 @@ export default function HomeScreen() {
       getGalleryImages(endCursor);
     }
   };
+  console.log(selectedImageDetail, 'selectedImageDetail')
 
   return (
     <SafeAreaView style={styles.container}>
@@ -62,7 +66,7 @@ export default function HomeScreen() {
         title="Open Image Picker"
         onPress={() => setModalVisible(true)} // Open the modal when button is pressed
       />
-      
+
       {/* Modal to show images */}
       <Modal
         animationType="slide"
@@ -79,7 +83,11 @@ export default function HomeScreen() {
 
           <FlatList
             data={['custom', ...images]}
-            renderItem={({ item }) => <RenderItem item={item} />}
+            renderItem={({ item }) => <RenderItem callBack={(selectedImage) => {
+              setModalVisible(false)
+              setSelectedImageDetail(selectedImage)
+              // console.log(, 'selectedImage')
+            }} item={item} />}
             keyExtractor={(item, index) => index.toString()}
             numColumns={3}
             onEndReached={loadMoreImages} // Trigger loading more images
@@ -88,6 +96,26 @@ export default function HomeScreen() {
           />
         </SafeAreaView>
       </Modal>
+      {selectedImageDetail && Object.keys(selectedImageDetail)?.length > 0 &&
+        <View
+          style={[
+            { height: '100%', width: '100%', }
+          ]}
+        >
+          <LinearGradient
+            colors={[selectedImageDetail.backgroundColorPrimary, selectedImageDetail.backgroundColorSecondary,]}
+            style={[]}
+          >
+            <View style={[{ justifyContent: "center", alignItems: "center" }]}>
+              <Image
+                style={{ height: '100%', width: '100%' }}
+                resizeMode='contain'
+                source={{ uri: selectedImageDetail.image }}
+              />
+            </View>
+          </LinearGradient>
+        </View >
+      }
     </SafeAreaView>
   );
 };
@@ -96,13 +124,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    justifyContent:"center",alignItems:"center",
+    justifyContent: "center", alignItems: "center",
     backgroundColor: '#f5f5f5',
   },
   modalContainer: {
     flex: 1,
     backgroundColor: '#fff',
     // padding: 20,
+    height: '80%',
     justifyContent: 'center',
   },
   modalHeader: {
