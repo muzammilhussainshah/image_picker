@@ -15,29 +15,14 @@ const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 
-export function RenderItem({ item }) {
+export function RenderItem({ item }: any) {
     const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
     const [selectedImages, setSelectedImages] = useState([]);
-
-    // useEffect(() => {
-    //     // Extract dominant color from the image and set it as background
-    //     const fetchDominantColor = async () => {
-    //         try {
-    //             const color = await DominantColor.getDominantColor(item.uri);
-    //             setBackgroundColor(color);
-    //         } catch (error) {
-    //             console.error('Error fetching dominant color:', error);
-    //         }
-    //     };
-
-    //     fetchDominantColor();
-    // }, [item.uri]);
-    console.log(item.uri, 'item')
     useEffect(() => {
         // Extract dominant color from the image and set it as background
         const fetchDominantColor = async () => {
-            const fileData = await CameraRoll.iosGetImageDataById(item.uri);
-            const result = await ImageColors.getColors(fileData.node.image.filepath, {
+            const fileData: any = await CameraRoll.iosGetImageDataById(item.uri);
+            const result: any = await ImageColors.getColors(fileData.node.image.filepath, {
                 fallback: '#ffffff', // Fallback color in case extraction fails
                 cache: true,
             });
@@ -49,13 +34,13 @@ export function RenderItem({ item }) {
         fetchDominantColor();
     }, [item.uri]);
 
-    const toggleSelectImage = (uri) => {
-        if (selectedImages.includes(uri)) {
-            setSelectedImages(selectedImages.filter((imageUri) => imageUri !== uri));
-        } else {
-            setSelectedImages([...selectedImages, uri]);
-        }
-    };
+    // const toggleSelectImage = (uri) => {
+    //     if (selectedImages.includes(uri)) {
+    //         setSelectedImages(selectedImages.filter((imageUri) => imageUri !== uri));
+    //     } else {
+    //         setSelectedImages([...selectedImages, uri]);
+    //     }
+    // };
 
     return (
         <TouchableOpacity
@@ -64,7 +49,7 @@ export function RenderItem({ item }) {
                 { backgroundColor }, // Set the extracted background color
                 selectedImages.includes(item.uri) && styles.selectedImageContainer,
             ]}
-            onPress={() => toggleSelectImage(item.uri)}
+            // onPress={() => toggleSelectImage(item.uri)}
         >
             <View style={styles.imageWrapper}>
                 {/* <FastImage
@@ -78,11 +63,11 @@ export function RenderItem({ item }) {
                     source={{ uri: item.uri }}
                 />
             </View>
-            {selectedImages.includes(item.uri) && (
+            {/* {selectedImages.includes(item.uri) && (
                 <View style={styles.overlay}>
                     <Text style={styles.checkmark}>✓</Text>
                 </View>
-            )}
+            )} */}
         </TouchableOpacity>
     );
 }
