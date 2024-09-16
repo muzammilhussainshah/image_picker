@@ -51,11 +51,17 @@ export function RenderItem({ item }: any) {
                 >
                     <LinearGradient
                         colors={[backgroundColorPrimary, backgroundColorSecondary,]}
-                        style={styles.background}
+                        style={[styles.background, { borderWidth: 1 }]}
                     >
                         <View style={[styles.imageWrapper, { justifyContent: "center", alignItems: "center" }]}>
-                            <Text >camera</Text>
 
+                            <Text >Camera</Text>
+                            <Image
+                                style={{ height: 50, width: 50 }}
+                                resizeMode='contain'
+                                // source={{ uri: 'https://e7.pngegg.com/pngimages/21/312/png-clipart-camera-computer-icons-graphy-camera-icon-camera-lens-camera-icon.png' }}
+                                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1206/1206803.png' }}
+                            />
                         </View>
                     </LinearGradient>
                 </TouchableOpacity >
