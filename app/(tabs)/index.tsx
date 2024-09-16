@@ -1,70 +1,141 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  Button,
+  Platform,
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import * as DominantColor from 'react-native-dominant-color'; // Install this library for dominant color extraction
+import FastImage from 'react-native-fast-image'; // For optimized image rendering
+import { RenderItem } from '@/components/RenderImage';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const { width } = Dimensions.get('window');
+const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
 
 export default function HomeScreen() {
+  const [images, setImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+
+  const openImagePicker = async () => {
+    // Ask for permissions
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need media library permissions to make this work!');
+      return;
+    }
+
+    // Open image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+    });
+
+    if (!result.cancelled) {
+      setImages(result.assets);
+    }
+  };
+
+  // const renderItem = ({ item }) => {
+  //   const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // Default background color
+
+  //   useEffect(() => {
+  //     // Extract dominant color from the image and set it as background
+  //     const fetchDominantColor = async () => {
+  //       try {
+  //         const color = await DominantColor.getDominantColor(item.uri);
+  //         setBackgroundColor(color);
+  //       } catch (error) {
+  //         console.error('Error fetching dominant color:', error);
+  //       }
+  //     };
+
+  //     fetchDominantColor();
+  //   }, [item.uri]);
+
+  //   return (
+  //     <TouchableOpacity
+  //       style={[
+  //         styles.imageContainer,
+  //         { backgroundColor }, // Set the extracted background color
+  //         selectedImages.includes(item.uri) && styles.selectedImageContainer,
+  //       ]}
+  //       onPress={() => toggleSelectImage(item.uri)}
+  //     >
+  //       <View style={styles.imageWrapper}>
+  //         <FastImage
+  //           source={{ uri: item.uri }}
+  //           style={styles.image}
+  //           resizeMode={FastImage.resizeMode.contain} // Maintain the aspect ratio of the image
+  //         />
+  //       </View>
+  //       {selectedImages.includes(item.uri) && (
+  //         <View style={styles.overlay}>
+  //           <Text style={styles.checkmark}>✓</Text>
+  //         </View>
+  //       )}
+  //     </TouchableOpacity>
+  //   );
+  // };
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      {/* <Button title="Open Image Picker" onPress={openImagePicker} /> */}
+      <Button title="Open Image Picker" onPress={() => { }} />
+      <FlatList
+        data={images}
+        renderItem={({ item }) => {
+          return (
+            <RenderItem item={item} />
+          )
+        }}
+        keyExtractor={(item) => item.uri}
+        numColumns={3}
+      />
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    marginTop: 100,
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+  },
+  imageContainer: {
+    width: width / 3, // 3 images per row
+    height: portraitHeight, // Fixed height to create the portrait effect
+    justifyContent: 'center', // Center the image vertically
+    alignItems: 'center', // Center the image horizontally
+    margin: 3,
+    position: 'relative',
+  },
+  imageWrapper: {
+    width: '90%', // Adjust this based on how much padding you want between the image and the container
+    height: '90%', // Adjust this to create spacing between image and background
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  selectedImageContainer: {
+    borderColor: 'blue',
+    borderWidth: 3,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  checkmark: {
+    color: 'white',
+    fontSize: 30,
   },
 });
