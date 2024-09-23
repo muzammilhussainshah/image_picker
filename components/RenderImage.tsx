@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import {
+    useEffect,
+    useState
+} from 'react';
+import {
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import ImageColors from 'react-native-image-colors';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    withRepeat,
-    withSequence,
-} from 'react-native-reanimated';
 import * as ImagePicker from 'expo-image-picker';
-
-const { width } = Dimensions.get('window');
-const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { LinearGradient } from 'expo-linear-gradient';
 
+const { width } = Dimensions.get('window');
+const portraitHeight = (width / 3) * 1.5; // Portrait size ratio (3:4)
 
 export function RenderItem({ item, callBack }: any) {
     const [backgroundColorPrimary, setBackgroundColorPrimary] = useState('#ffffff'); // Default background color
@@ -34,21 +35,12 @@ export function RenderItem({ item, callBack }: any) {
                 console.log(result, 'result')
                 if (result.platform === 'android' || result.platform === 'ios') {
                     setBackgroundColorPrimary(result.background); // Use average or dominant color
-                    setBackgroundColorSecondary(result.primary ); // Use average or dominant color
+                    setBackgroundColorSecondary(result.primary); // Use average or dominant color
                 }
             };
             fetchDominantColor();
         }
     }, [item?.uri]);
-    // const requestCameraPermission = async () => {
-    //     if (Platform.OS !== 'web') {
-    //         const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    //         if (status !== 'granted') {
-    //             alert('Sorry, we need camera permissions to make this work!');
-    //         }
-    //     }
-    // };
-    // Camera open karne ke liye function
     const openCamera = async () => {
         console.log(ImagePicker, 'ImagePicker')
         let result = await ImagePicker.launchCameraAsync({
@@ -59,17 +51,6 @@ export function RenderItem({ item, callBack }: any) {
         });
 
         if (!result.canceled) {
-            // setImage(result.assets[0].uri);
-            // const result: any = await ImageColors.getColors(result.assets[0].uri, {
-            //     fallback: '#ffffff', // Fallback color in case extraction fails
-            //     cache: true,
-            // });
-            // if (result.platform === 'android' || result.platform === 'ios') {
-            //     setBackgroundColorPrimary(result.background); // Use average or dominant color
-            //     setBackgroundColorSecondary(result.primary); // Use average or dominant color
-            //     callBack({ image: result.assets[0].uri, backgroundColorPrimary: result.background, backgroundColorSecondary: result.primary })
-            // }
-
         }
     };
 
@@ -88,7 +69,6 @@ export function RenderItem({ item, callBack }: any) {
                         style={[styles.background, { borderWidth: 1, }]}
                     >
                         <View style={[styles.imageWrapper, { justifyContent: "center", alignItems: "center" }]}>
-
                             <Text >Camera</Text>
                             <Image
                                 style={{ height: 50, width: 50 }}
@@ -114,7 +94,7 @@ export function RenderItem({ item, callBack }: any) {
                         colors={[backgroundColorPrimary, backgroundColorSecondary,]}
                         style={[styles.background, {}]}
                     >
-                        <View style={{ backgroundColor: "rgba(0,0,0,.3)", position: "absolute",zIndex:-2, height: "100%", width: '100%' }}></View>
+                        <View style={{ backgroundColor: "rgba(0,0,0,.3)", position: "absolute", zIndex: -2, height: "100%", width: '100%' }}></View>
                         <View style={styles.imageWrapper}>
 
                             <Image
