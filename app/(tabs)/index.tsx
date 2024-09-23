@@ -62,10 +62,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Button
-        title="Open Image Picker"
+      <TouchableOpacity
         onPress={() => setModalVisible(true)} // Open the modal when button is pressed
-      />
+        style={{ position: "absolute", zIndex: 2, bottom: '20%', }}>
+        <View style={{ backgroundColor: 'green', padding: 20, borderRadius: 20 }}>
+          <Text style={{ color: 'white', fontSize: 24 }}>Open Image Picker</Text>
+        </View>
+      </TouchableOpacity>
 
       {/* Modal to show images */}
       <Modal
@@ -106,6 +109,7 @@ export default function HomeScreen() {
             colors={[selectedImageDetail.backgroundColorPrimary, selectedImageDetail.backgroundColorSecondary,]}
             style={[]}
           >
+            <View style={{ backgroundColor: "rgba(0,0,0,.3)", position: "absolute", zIndex: -2, height: "100%", width: '100%' }}></View>
             <View style={[{ justifyContent: "center", alignItems: "center" }]}>
               <Image
                 style={{ height: '100%', width: '100%' }}

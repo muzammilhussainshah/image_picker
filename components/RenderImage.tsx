@@ -31,9 +31,10 @@ export function RenderItem({ item, callBack }: any) {
                     fallback: '#ffffff', // Fallback color in case extraction fails
                     cache: true,
                 });
+                console.log(result, 'result')
                 if (result.platform === 'android' || result.platform === 'ios') {
                     setBackgroundColorPrimary(result.background); // Use average or dominant color
-                    setBackgroundColorSecondary(result.primary); // Use average or dominant color
+                    setBackgroundColorSecondary(result.primary ); // Use average or dominant color
                 }
             };
             fetchDominantColor();
@@ -84,7 +85,7 @@ export function RenderItem({ item, callBack }: any) {
                 >
                     <LinearGradient
                         colors={[backgroundColorPrimary, backgroundColorSecondary,]}
-                        style={[styles.background, { borderWidth: 1 }]}
+                        style={[styles.background, { borderWidth: 1, }]}
                     >
                         <View style={[styles.imageWrapper, { justifyContent: "center", alignItems: "center" }]}>
 
@@ -111,12 +112,14 @@ export function RenderItem({ item, callBack }: any) {
                 >
                     <LinearGradient
                         colors={[backgroundColorPrimary, backgroundColorSecondary,]}
-                        style={styles.background}
+                        style={[styles.background, {}]}
                     >
+                        <View style={{ backgroundColor: "rgba(0,0,0,.3)", position: "absolute",zIndex:-2, height: "100%", width: '100%' }}></View>
                         <View style={styles.imageWrapper}>
 
                             <Image
                                 style={styles.image}
+                                // blurRadius={1}
                                 resizeMode='contain'
                                 source={{ uri: item.uri }}
                             />
